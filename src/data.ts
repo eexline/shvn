@@ -64,6 +64,7 @@ export const PAIRS: Pair[] = [
 
 export const TIMEFRAMES: Timeframe[] = [
   { id: '1m', label: '1 минута', short: '1м' },
+  { id: '3m', label: '3 минуты', short: '3м' },
   { id: '5m', label: '5 минут', short: '5м' },
   { id: '15m', label: '15 минут', short: '15м' },
   { id: '60m', label: '1 hour', short: '1H' },

@@ -54,6 +54,8 @@ export function toTvInterval(tf: Timeframe | null | undefined): string {
   switch (tf.id) {
     case '1m':
       return '1'
+    case '3m':
+      return '3'
     case '5m':
       return '5'
     case '15m':

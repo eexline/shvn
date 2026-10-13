@@ -150,9 +150,10 @@ const tfEn = {
   '15s': { label: '15 seconds', short: '15s' },
   '30s': { label: '30 seconds', short: '30s' },
   '1m': { label: '1 minute', short: '1m' },
+  '3m': { label: '3 minutes', short: '3m' },
   '5m': { label: '5 minutes', short: '5m' },
   '15m': { label: '15 minutes', short: '15m' },
-    '60m': { label: '1 hour', short: '1H' },
+  '60m': { label: '1 hour', short: '1H' },
 }
 
 export const en: Dict = {
@@ -408,6 +409,7 @@ export const ru: Dict = {
     '15s': { label: '15 секунд', short: '15с' },
     '30s': { label: '30 секунд', short: '30с' },
     '1m': { label: '1 минута', short: '1м' },
+    '3m': { label: '3 минуты', short: '3м' },
     '5m': { label: '5 минут', short: '5м' },
     '15m': { label: '15 минут', short: '15м' },
     '60m': { label: '1 час', short: '1H' },
