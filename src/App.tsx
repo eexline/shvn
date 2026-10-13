@@ -9,8 +9,8 @@ import {
 } from 'react'
 import {
   AMOUNTS,
+  BROKER_NAME,
   MARKETS,
-  MOCK_BALANCE,
   MODELS,
   PAIRS,
   PLANS,
@@ -29,6 +29,7 @@ import {
   type Pair,
   type Timeframe,
 } from './data'
+import { fetchDeposit } from './depositApi'
 import { Dock, DockIcon } from './Dock'
 import { BrandLogo } from './logos'
 import { MagicCard } from './MagicCard'
@@ -105,8 +106,8 @@ function capMessages(msgs: ChatMessage[]): ChatMessage[] {
   return [...durable.slice(-MAX_MESSAGES), ...status]
 }
 
-function initialAgentId() {
-  const plan = planFromDeposit(MOCK_BALANCE.real)
+function initialAgentId(deposit = 0) {
+  const plan = planFromDeposit(deposit)
   const saved = loadAgentId()
   if (saved) {
     const found = findAgent(saved)
@@ -127,7 +128,9 @@ export default function App() {
   const [market, setMarket] = useState<MarketId>('otc')
   const [timeframe, setTimeframe] = useState<Timeframe | null>(null)
   const [amount, setAmount] = useState<number | null>(null)
-  const [agentId, setAgentId] = useState(initialAgentId)
+  const [agentId, setAgentId] = useState(() => initialAgentId(0))
+  const [deposit, setDeposit] = useState(0)
+  const [depositReady, setDepositReady] = useState(false)
   const [locale, setLocale] = useState<Locale>(loadLocale)
   const [langOpen, setLangOpen] = useState(false)
   const [historyOpen, setHistoryOpen] = useState(false)
@@ -176,7 +179,6 @@ export default function App() {
   const tgUser = getTelegramUser()
   const tgName = telegramDisplayName(tgUser)
   const tgInitials = telegramInitials(tgUser)
-  const deposit = MOCK_BALANCE.real
   const currentPlan = planFromDeposit(deposit)
   const upcoming = nextPlan(currentPlan)
   const progressToNext = upcoming
@@ -220,6 +222,32 @@ export default function App() {
       return capMessages(next)
     })
   }
+
+  useEffect(() => {
+    let cancelled = false
+    setDepositReady(false)
+    fetchDeposit(tgUser.id)
+      .then((value) => {
+        if (cancelled) return
+        setDeposit(value)
+        setAgentId((prev) => {
+          const plan = planFromDeposit(value)
+          const found = findAgent(prev)
+          if (isAgentUnlocked(found.agent, plan.id)) return prev
+          return firstUnlockedAgent(plan.id).agent.id
+        })
+      })
+      .catch((err) => {
+        console.error('[deposit]', err)
+        if (!cancelled) setDeposit(0)
+      })
+      .finally(() => {
+        if (!cancelled) setDepositReady(true)
+      })
+    return () => {
+      cancelled = true
+    }
+  }, [tgUser.id])
 
   useEffect(() => {
     saveAgentId(agentId)
@@ -1039,7 +1067,7 @@ export default function App() {
                     ? `@${tgUser.username}`
                     : `id · ${tgUser.id}`}
                   {' · '}
-                  {MOCK_BALANCE.broker}
+                  {BROKER_NAME}
                 </p>
               </header>
 
@@ -1048,7 +1076,10 @@ export default function App() {
                   <span className="profile-balance-label">{t.deposit}</span>
                   <span className="profile-chip">{currentPlan.name}</span>
                 </div>
-                <div className="profile-balance-value">
+                <div
+                  className="profile-balance-value"
+                  aria-busy={!depositReady}
+                >
                   <span className="profile-balance-currency">$</span>
                   <NumberTicker value={deposit} decimalPlaces={0} />
                 </div>
@@ -1121,7 +1152,7 @@ export default function App() {
               <div className="profile-panel">
                 <div className="profile-panel-row">
                   <span>{t.broker}</span>
-                  <strong>{MOCK_BALANCE.broker}</strong>
+                  <strong>{BROKER_NAME}</strong>
                 </div>
                 <div className="profile-panel-row">
                   <span>{t.updated}</span>

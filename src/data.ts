@@ -100,7 +100,6 @@ export function formatPairLabel(
   return market === 'otc' ? `${pair.label} OTC` : pair.label
 }
 
-/** Заглушка депозита — позже из БД */
 export type BrokerBalance = {
   real: number
   demo: number
@@ -109,13 +108,8 @@ export type BrokerBalance = {
   updatedAt: string
 }
 
-export const MOCK_BALANCE: BrokerBalance = {
-  real: 1284.56,
-  demo: 10000,
-  currency: 'USD',
-  broker: 'Pocket Option',
-  updatedAt: 'только что',
-}
+/** Имя брокера в профиле (сумма депозита приходит из postback_shahov) */
+export const BROKER_NAME = 'Pocket Option'
 
 export type Plan = {
   id: PlanId
